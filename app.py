@@ -1,32 +1,31 @@
 import streamlit as st
-import pandas as pd
+import cv2
 import numpy as np
 
-st.set_page_config(page_title="Rakshak AI", layout="wide")
+st.title("🛡 Rakshak AI - Live Camera Detection")
 
-st.title("🛡 Rakshak AI Dashboard")
-st.write("System is running successfully ✅")
+# Browser camera
+camera_image = st.camera_input("Take a picture")
 
-st.markdown("---")
+if camera_image is not None:
+    # Convert to OpenCV format
+    file_bytes = np.asarray(bytearray(camera_image.read()), dtype=np.uint8)
+    frame = cv2.imdecode(file_bytes, 1)
 
-# Metrics
-col1, col2, col3 = st.columns(3)
+    # Face detection
+    face_cascade = cv2.CascadeClassifier(
+        cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+    )
 
-col1.metric("Active Alerts", "5")
-col2.metric("Threat Level", "Medium")
-col3.metric("System Status", "Running")
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
 
-st.markdown("---")
+    for (x, y, w, h) in faces:
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
-# Chart
-st.subheader("Threat Analysis Overview")
+    st.image(frame, channels="BGR")
 
-data = pd.DataFrame(
-    np.random.randn(20, 2),
-    columns=["Zone A", "Zone B"]
-)
-
-st.line_chart(data)
-
-st.success("App deployed successfully on Streamlit Cloud 🎉")
-
+    if len(faces) > 0:
+        st.warning(f"🟡 {len(faces)} Person Detected")
+    else:
+        st.success("🟢 No Person Detected")
