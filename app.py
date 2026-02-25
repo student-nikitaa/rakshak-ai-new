@@ -1,4 +1,3 @@
-st.title("🛡 Rakshak AI Dashboard")
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -30,4 +29,4 @@ data = pd.DataFrame(
 st.line_chart(data)
 
 st.success("App deployed successfully on Streamlit Cloud 🎉")
-st.success("Rakshak AI Successfully Deployed on Streamlit Cloud 🚀")
+
